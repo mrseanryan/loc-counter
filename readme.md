@@ -1,4 +1,4 @@
-# loc (Lines Of Code) counter
+# :memo: loc (Lines Of Code) counter
 
 Counts how many lines of code are in a code base, by programming language.
 
