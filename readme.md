@@ -16,17 +16,17 @@ The programming languages are determined via the file extensions.
 ### Example output
 
 ```
-Type            Files   Lines
-Python          1       377
+Type                    Files   Lines
+Python                  1       377
 
-                Files   Lines
+                        Files   Lines
 Identified Code         1       377
 
-Skipped         2       75
+Skipped                 2       75
 Skipped extensions:             md
 
 
-Total           3       452
+Total                   3       452
 ```
 
 ### Detailed Usage
