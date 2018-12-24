@@ -1,32 +1,41 @@
 # loc (Lines Of Code) counter
 
 Counts how many lines of code are in a code base, by programming language.
+
 The programming languages are determined via the file extensions.
 
 ## Dependencies
 
 - Python 2.x
 
+## Installation
+
+- Download the [python script](./loc_counter.py) (or download or clone this whole repo)
+
+- Save the script in a suitable location, such as `/scripts`
+
 ## Usage
 
 ```
-./loc_counter.py
+cd /my_source_code
+
+./scripts/loc_counter.py
 ```
 
 ### Example output
 
 ```
-Type            Files   Lines
-Python          1       377
+Type                    Files   Lines
+Python                  1       377
 
-                Files   Lines
+                        Files   Lines
 Identified Code         1       377
 
-Skipped         2       75
+Skipped                 2       75
 Skipped extensions:             md
 
 
-Total           3       452
+Total                   3       452
 ```
 
 ### Detailed Usage
