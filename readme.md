@@ -1,8 +1,12 @@
 # :memo: loc (Lines Of Code) counter
 
-Counts how many lines of code are in a code base, by programming language.
+Counts how many lines of code (LOC/SLOC)* are in a code base, by programming language.
 
 The programming languages are determined via the file extensions.
+
+
+\* LOC = Lines Of Code
+\* SLOC = Source Lines Of Code
 
 ## Dependencies
 
