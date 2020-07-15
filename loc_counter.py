@@ -92,6 +92,8 @@ def filetype(name):
                      "pyl" : "Python",
                      "el" : "Emacs Lisp",
                      "elc" : "Emacs Lisp",
+                     "scala" : "Scala",
+                     "rs" : "Rust",
 #                    ### C++ ###
                      "h" : "C or C++ Header",
                      "hpp" : "C or C++ Header",
