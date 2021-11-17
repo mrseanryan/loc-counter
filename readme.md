@@ -10,7 +10,7 @@ The programming languages are determined via the file extensions.
 
 ## Dependencies
 
-- Python 2.x
+- Python 3.x
 
 ## Installation
 
