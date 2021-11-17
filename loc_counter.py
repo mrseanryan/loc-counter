@@ -250,8 +250,8 @@ def main():
             type = filetype(fullname)
 
             # Avoid trying to read binary files
-            (root, extension) = os.path.splitext(name)
-            if extension.lower() in extensions_to_always_skip:
+            (root2, extension2) = os.path.splitext(name)
+            if extension2.lower() in extensions_to_always_skip:
                 continue
 
             if options.verbose:
