@@ -146,10 +146,9 @@ def filetype(name):
                      "cshtml" : "MVC View Razor",
                      "ts": "TypeScript"
                      }
-  
-  
+
     file_name_parts_to_skip = [ "ai.0.", "bootstrap.", "jquery.", "jquery-", "modernizr", ".min.js",  ".min.css", "\\Lib\\", "\\External\\", "ASPxScriptIntelliSense.js", "jquery", "\\packages\\", "\\node_modules\\", "Silverlight.js", "\\bower_components\\", "\\tmp\\", "\\temp\\", ".git" ]
-  
+
     (root, extension) = os.path.splitext(name)
 
     # Special case the search for Makefiles as these are important but
@@ -166,7 +165,7 @@ def filetype(name):
     for exclude in file_name_parts_to_skip:
         if exclude.lower() in name.lower():
             return "Excluded"
-    
+
     # According to the rules if we have an extension then it ALWAYS has
     # a . at the beginning.  Strip that .
     extension = extension[1:len(extension)]
@@ -223,6 +222,7 @@ def main():
     exclude_list = exclude_list_default + options.exclude_dir
     language = options.language
     pretty = options.pretty
+    extensions_to_always_skip = [".png", ".gif", ".jpg", ".jpeg", ".bmp"]
 
     for root, dirs, files in os.walk("."):
         if 'CVS' in dirs:
@@ -248,6 +248,11 @@ def main():
             if not os.access(fullname, F_OK):
                 continue
             type = filetype(fullname)
+
+            # Avoid trying to read binary files
+            (root, extension) = os.path.splitext(name)
+            if extension.lower() in extensions_to_always_skip:
+                continue
 
             if options.verbose:
                 print(fullname)
