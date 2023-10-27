@@ -78,6 +78,8 @@ The program automatically ignores any file in a CVS diretory.
 import os
 from os import F_OK
 
+import mimetypes # help to avoid parsing binary files
+
 unknownExtensions = []
 
 # This is the file extension mapping code.  Change this array if you
@@ -149,6 +151,9 @@ def filetype(name):
 
     file_name_parts_to_skip = [ "ai.0.", "bootstrap.", "jquery.", "jquery-", "modernizr", ".min.js",  ".min.css", "\\Lib\\", "\\External\\", "ASPxScriptIntelliSense.js", "jquery", "\\packages\\", "\\node_modules\\", "Silverlight.js", "\\bower_components\\", "\\tmp\\", "\\temp\\", ".git" ]
 
+    binary_mime_types = [ "application/octet-stream", "application/pdf" ]
+    binary_mime_type_parts = [ "application/vnd" ]
+
     (root, extension) = os.path.splitext(name)
 
     # Special case the search for Makefiles as these are important but
@@ -164,7 +169,14 @@ def filetype(name):
 
     for exclude in file_name_parts_to_skip:
         if exclude.lower() in name.lower():
-            return "Excluded"
+            return "Excluded:file_name_part"
+
+    mime = mimetypes.guess_type(name)
+    if (mime[0] is not None and mime[0] in binary_mime_types) or mime[1] == 'gzip':
+        return "Excluded:mime-binary"
+    for exclude in binary_mime_type_parts:
+        if mime[0] is not None and mime[0] in exclude:
+            return "Excluded:mime:binary-part"
 
     # According to the rules if we have an extension then it ALWAYS has
     # a . at the beginning.  Strip that .
@@ -180,9 +192,9 @@ def filetype(name):
 # We know that "name" is a file because it was passed to us by
 # os.walk() in main().
 
-def filelines(name):
+def filelines(name, encoding):
     try:
-        file = open(name)
+        file = open(name, 'r', encoding=encoding)
     except:
         return -1
     lines = file.readlines()
@@ -200,12 +212,9 @@ def main():
     from optparse import OptionParser
 
     parser = OptionParser()
-    parser.add_option("-v", "--verbose",
-                      action="store_true", dest="verbose", default=False,
-                      help="Verbose output")
-    parser.add_option("-w", "--where",
-                      action="store_true", dest="where", default=False,
-                      help="Print where files are located")
+    parser.add_option("-c", "--encoding", action="store", type="string",
+                      default = "utf-8", dest="encoding",
+                      help="The file encoding to use when reading (default is utf-8)")
     parser.add_option("-e", "--exclude", action="append", default=[],
                       dest="exclude_dir", help="Directory to exclude")
     parser.add_option("-l", "--language", action="store", type="string",
@@ -214,15 +223,21 @@ def main():
     parser.add_option("-p", "--pretty", action="store", type="string",
                       dest="pretty",
                       help="Pretty print in HTML or LaTeX table format")
+    parser.add_option("-v", "--verbose",
+                      action="store_true", dest="verbose", default=False,
+                      help="Verbose output")
+    parser.add_option("-w", "--where",
+                      action="store_true", dest="where", default=False,
+                      help="Print where files are located")
     
     (options, args) = parser.parse_args()
 
     where = options.where
-    exclude_list_default = [ "$tf", ".git", ".hg", "coverage", "External", "apps_out", "bin", "bower_components", "css_out", "dist", "jquery", "js_out", "lib", "node_modules", "obj", "packages", "published", "temp""tmp", "typings" ]
+    exclude_list_default = [ "$tf", ".git", ".hg", "coverage", "External", "apps_out", "bin", "bower_components", "css_out", "dist", "jquery", "js_out", "lib", "node_modules", "obj", "packages", "published", "temp", "tmp", "typings" ]
     exclude_list = exclude_list_default + options.exclude_dir
     language = options.language
     pretty = options.pretty
-    extensions_to_always_skip = [".png", ".gif", ".jpg", ".jpeg", ".bmp"]
+    extensions_to_always_skip = [".png", ".gif", ".jpg", ".jpeg", ".bmp", ".mpr", ".zip", ".tar", ".jar", ".gz", ".ico", ".eot", ".docx"]
 
     for root, dirs, files in os.walk("."):
         if 'CVS' in dirs:
@@ -249,14 +264,19 @@ def main():
                 continue
             type = filetype(fullname)
 
+            #print (f"{fullname} - [{type}]")
+
             # Avoid trying to read binary files
             (root2, extension2) = os.path.splitext(name)
-            if extension2.lower() in extensions_to_always_skip:
+            if extension2.lower() in extensions_to_always_skip or type.startswith("Excluded") or type == "Unknown":
+                if(options.verbose):
+                    print(f"excluding: {fullname} [type = {type}]")
                 continue
 
             if options.verbose:
-                print(fullname)
-            
+                mime = mimetypes.guess_type(name)[0]
+                print(f"{fullname} [{mime}]")
+
             if (language and (type != language)):
                 continue
 
@@ -264,7 +284,7 @@ def main():
                 file_map[type] = 1
             else:
                 file_map[type] += 1
-            lines = filelines(fullname)
+            lines = filelines(fullname, options.encoding)
 
             if lines == -1:
                 continue
